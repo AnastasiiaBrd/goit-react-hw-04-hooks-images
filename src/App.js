@@ -27,7 +27,6 @@ export default class App extends Component {
   };
   handleFormSubmit = (imageName) => {
     this.setState({ imageName: imageName, page: 1, images: [] });
-    console.log(imageName);
   };
   loadmore = () => {
     this.setState((prevState) => {
@@ -43,31 +42,19 @@ export default class App extends Component {
     )
       .then((res) => res.json())
       .then((data) => {
-        this.setState((prevState) => {
-          return { images: [...prevState.images, ...data.hits] };
-        });
-        console.log(this.state.images);
-      })
-      .catch((error) => this.setState({ error }))
-      .finally(() => this.setState({ isLoading: false }));
-  };
-
-  addImages = () => {
-    this.setState({ isLoading: true });
-    fetch(
-      `https://pixabay.com/api/?q=${this.state.imageName}&page=${this.state.page}&key=${clienId}&per_page=12`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        this.setState({ images: data.hits });
-        console.log(data.hits);
+        this.setState((prevState) => ({
+          images:
+            this.state.page > 1
+              ? [...prevState.images, ...data.hits]
+              : data.hits,
+        }));
       })
       .catch((error) => this.setState({ error }))
       .finally(() => this.setState({ isLoading: false }));
   };
 
   componentDidMount() {
-    this.addImages();
+    this.loadImages();
   }
   componentDidUpdate(prevProps, prevState) {
     const prevName = prevState.imageName;
